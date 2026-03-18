@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Yandhi Player</title>
+
+<style>
+  body {
+    margin: 0;
+    background: white;
+    overflow: hidden;
+    font-family: sans-serif;
+  }
+
+  /* PURPLE INTRO SCREEN */
+  #intro {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #6a00ff;
+    z-index: 999;
+    opacity: 1;
+    transition: opacity 1.5s ease;
+  }
+
+  #cd {
+  width: 200px;
+  position: absolute;
+  top: 50%;
+  left: 20%;
+  cursor: grab;
+  user-select: none;
+  z-index: 10;
+
+  /* ✨ GOLDEN GLOW (soft + transparent) */
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.35))
+          drop-shadow(0 0 25px rgba(255, 200, 0, 0.25))
+          drop-shadow(0 0 45px rgba(255, 180, 0, 0.15));
+
+  /* levitate */
+  animation: float 2.5s ease-in-out infinite;
+}
+/* floating up and down */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+  #player {
+    width: 300px;
+    position: absolute;
+    top: 50%;
+    left: 70%;
+    transform: translate(-50%, -50%);
+  }
+</style>
+</head>
+
+<body>
+
+<!-- INTRO OVERLAY -->
+<div id="intro"></div>
+
+<img id="cd" src="Yandhi.png" draggable="false">
+<img id="player" src="h.png">
+
+<audio id="audio" src="CHAKRAS 2.mp3"></audio>
+
+<script>
+const cd = document.getElementById("cd");
+const player = document.getElementById("player");
+const audio = document.getElementById("audio");
+const intro = document.getElementById("intro");
+
+let holding = false;
+
+// prevent default drag
+cd.addEventListener("dragstart", (e) => e.preventDefault());
+
+// click to pick up / drop
+cd.addEventListener("click", () => {
+  holding = !holding;
+
+  if (holding) {
+    cd.style.cursor = "grabbing";
+  } else {
+    cd.style.cursor = "grab";
+
+    // check drop on player
+    const playerRect = player.getBoundingClientRect();
+    const cdRect = cd.getBoundingClientRect();
+
+    const overlap =
+      cdRect.right > playerRect.left &&
+      cdRect.left < playerRect.right &&
+      cdRect.bottom > playerRect.top &&
+      cdRect.top < playerRect.bottom;
+
+    if (overlap) {
+      cd.style.display = "none";
+      player.src = "full.png";
+      audio.play();
+    }
+  }
+});
+
+// follow cursor when holding
+document.addEventListener("mousemove", (e) => {
+  if (!holding) return;
+
+  cd.style.left = (e.clientX - cd.offsetWidth / 2) + "px";
+  cd.style.top = (e.clientY - cd.offsetHeight / 2) + "px";
+});
+
+// INTRO FADE OUT
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    intro.style.opacity = "0";
+
+    setTimeout(() => {
+      intro.style.display = "none";
+    }, 1500);
+
+  }, 500);
+});
+</script>
+
+</body>
+</html>
